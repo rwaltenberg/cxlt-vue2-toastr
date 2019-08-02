@@ -24,6 +24,11 @@
                     </p>
                     <p class="control">
                         <label class="checkbox">
+                            <input type="checkbox" v-model="toastr.closeOnClick"> Close on click
+                        </label>
+                    </p>
+                    <p class="control">
+                        <label class="checkbox">
                             <input type="checkbox" v-model="toastr.progressBar"> Progress Bar
                         </label>
                     </p>
@@ -327,6 +332,7 @@ export default {
                 title: 'Toastr Notification',
                 message: 'Gnome & Growl type non-blocking notifications',
                 closeButton: true,
+                closeOnClick: false,
                 progressBar: false,
                 icon:icons['success'][0],
                 position: 'top right',
@@ -346,25 +352,31 @@ export default {
     },
     methods: {
         showToastr() {
+            let toast;
+
             this.toastr = Object.assign(this.toastr, {
                 color: this.colors.hex
             })
             switch (this.type) {
                 case 'success':
-                    this.$toast.success(this.toastr)
+                    toast = this.$toast.success(this.toastr)
                     break;
                 case 'info':
-                    this.$toast.info(this.toastr)
+                    toast = this.$toast.info(this.toastr)
                     break;
                 case 'warning':
-                    this.$toast.warn(this.toastr)
+                    toast = this.$toast.warn(this.toastr)
                     break;
                 case 'error':
-                    this.$toast.error(this.toastr)
+                    toast = this.$toast.error(this.toastr)
                     break;
                 default:
                     break;
             }
+
+            toast.$on('click', () => {
+                this.$toast.info({ message: 'Toast clicked!' })
+            })
         },
         hideToastr() {
             this.$toast.removeAll()

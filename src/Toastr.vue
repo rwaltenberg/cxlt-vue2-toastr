@@ -1,7 +1,7 @@
 <template>
     <transition :enter-active-class="enterActiveClass" :leave-active-class="leaveActiveClass" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave">
-        <div class="toast" :class="['toast-'+type]" :style="{backgroundColor:toastBackgroundColor}" v-if="show">
-            <button class="toast-close-button" role="button" @click="hideToastr" v-if="closeButton">×</button>
+        <div class="toast" :class="['toast-'+type]" :style="{backgroundColor:toastBackgroundColor}" v-if="show" @click="toastClicked">
+            <button class="toast-close-button" role="button" @click.stop="hideToastr" v-if="closeButton">×</button>
             <div class="toast-progress" v-if="progressBar" :style="'width: ' + progress.percent + '%'"></div>
             <div class="toast-icon">
             <img :src="iconSrc"/>
@@ -51,6 +51,10 @@ export default {
         closeButton: {
             type: Boolean,
             default: true
+        },
+        closeOnClick: {
+            type: Boolean,
+            default: false
         },
         progressBar: {
             type: Boolean,
@@ -143,7 +147,13 @@ export default {
     methods: {
         showToastr() {
             this.show = true
+
+            if (this.timeOut < 1) {
+                return
+            }
+
             this.sto = setTimeout(() => this.hideToastr(), this.timeOut)
+
             if (this.progressBar) {
                 this.progress.hideEta = new Date().getTime() + parseFloat(this.timeOut)
                 this.progress.intervalId = setInterval(() => this.refreshProgress(), 10)
@@ -156,6 +166,13 @@ export default {
         },
         refreshProgress() {
             this.progress.percent = ((this.progress.hideEta - (new Date().getTime())) / this.timeOut) * 100
+        },
+        toastClicked() {
+            if (this.closeOnClick) {
+                return this.hideToastr()
+            }
+
+            this.$emit('click', this)
         },
         beforeEnter(el) {
             el.style.animationDuration = this.showDuration + 'ms'
