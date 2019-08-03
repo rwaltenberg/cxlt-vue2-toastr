@@ -1,6 +1,7 @@
-import Toastr from './Toastr'
 import '@/assets/toastr.css'
 import 'animate.css/animate.css'
+
+import Toastr from './Toastr'
 
 const CxltToastr = {
     install: function (Vue, options) {
@@ -23,6 +24,13 @@ const CxltToastr = {
 
             return component
         }
+
+        setInterval(function digest() {
+            const digestible = showedToastrs.filter(m => m.digestible)
+            showedToastrs = showedToastrs.filter(m => !m.digestible)
+
+            digestible.forEach(m => m.$destroy())
+        }, 10000)
 
         Vue.prototype.$toast = {
             success(obj) {

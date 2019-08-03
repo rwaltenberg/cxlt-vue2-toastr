@@ -1,5 +1,5 @@
 <template>
-    <transition :enter-active-class="enterActiveClass" :leave-active-class="leaveActiveClass" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave">
+    <transition :enter-active-class="enterActiveClass" :leave-active-class="leaveActiveClass" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave" @after-leave="afterLeave">
         <div class="toast" :class="['toast-'+type]" :style="{backgroundColor:toastBackgroundColor}" v-if="show" @click="toastClicked">
             <button class="toast-close-button" role="button" @click.stop="hideToastr" v-if="closeButton">×</button>
             <div class="toast-progress" v-if="progressBar" :style="'width: ' + progress.percent + '%'"></div>
@@ -25,6 +25,7 @@ export default {
                 intervalId: null
             },
             show: false,
+            digestible: false,
             defaultIcons: {
                 success: require('./assets/success.png'),
                 info: require('./assets/info.png'),
@@ -183,6 +184,9 @@ export default {
         },
         beforeLeave(el) {
             el.style.animationDuration = this.hideDuration + 'ms'
+        },
+        afterLeave() {
+            this.digestible = true
         }
     }
 }
